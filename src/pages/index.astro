@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+import CodeEditor from '../components/CodeEditor';
+
+const title = 'toitoi.dev';
+const description = 'toitoi — interactive landing with a tiny code playground.';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#fafafa" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="lockup">
+          <img src="/assets/toitoidev-logo.svg" alt="toitoi mascot" class="mascot" />
+          <img src="/assets/toitoidev-typo.svg" alt="toitoi" class="typo" />
+        </div>
+        <span class="scroll-hint" aria-hidden="true">scroll ↓</span>
+      </section>
+
+      <section id="playground" class="playground" aria-labelledby="playground-title">
+        <header class="playground-head">
+          <h2 id="playground-title" class="playground-title">playground</h2>
+          <p class="playground-sub">
+            escribe, cambia el tema, prueba autocompletado con <kbd>Ctrl</kbd>+<kbd>Space</kbd>.
+          </p>
+        </header>
+        <div class="playground-frame">
+          <CodeEditor client:visible />
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
