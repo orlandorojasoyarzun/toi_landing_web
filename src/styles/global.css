@@ -496,7 +496,7 @@ main {
 .socials {
   position: fixed;
   z-index: 10;
-  background: rgba(200, 49, 42, 0.5);
+  background: rgba(200, 49, 42, 0.38);
   -webkit-backdrop-filter: blur(16px) saturate(1.15);
   backdrop-filter: blur(16px) saturate(1.15);
   color: #fff;
