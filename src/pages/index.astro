@@ -28,22 +28,29 @@ const description = 'toitoi — interactive landing with a tiny code playground.
     />
   </head>
   <body>
-    <video
-      class="bg-video is-active"
-      src="/video/school.mp4"
-      autoplay
-      muted
-      playsinline
-      preload="auto"
-      aria-hidden="true"></video>
-    <video class="bg-video" src="/video/hotel.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
-    <video class="bg-video" src="/video/bk.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+    <video class="bg-video is-active" data-clip="school" autoplay muted playsinline preload="auto" aria-hidden="true"></video>
+    <video class="bg-video" data-clip="hotel" muted playsinline preload="none" aria-hidden="true"></video>
+    <video class="bg-video" data-clip="bk" muted playsinline preload="none" aria-hidden="true"></video>
     <Sticker />
     <script>
       // school -> hotel -> bk -> school ... One <video> per clip, each keeps its own src (never reloaded).
-      // When one ends, the next (already rewound and buffered) starts, and the finished one rewinds.
+      // Phones get the light 480p files; only the playing clip loads at first, the next one is
+      // fetched once the current one is a few seconds in, so they never compete for bandwidth.
       const clips = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-video'));
+      const suffix = window.matchMedia('(max-width: 720px)').matches ? '-m' : '';
       let current = 0;
+
+      clips.forEach((v) => {
+        v.src = `/video/${v.dataset.clip}${suffix}.mp4`;
+      });
+      clips[0].play().catch(() => {});
+
+      const warm = (v: HTMLVideoElement) => {
+        if (v.dataset.warm) return;
+        v.dataset.warm = '1';
+        v.preload = 'auto';
+        v.load();
+      };
 
       const advance = () => {
         const prev = clips[current];
@@ -55,12 +62,16 @@ const description = 'toitoi — interactive landing with a tiny code playground.
           prev.classList.remove('is-active');
           prev.currentTime = 0;
         };
+        warm(next);
         if (next.readyState >= 3) show();
         else next.addEventListener('canplay', show, { once: true });
       };
 
-      clips.forEach((v) => {
+      clips.forEach((v, i) => {
         v.addEventListener('ended', () => v === clips[current] && advance());
+        v.addEventListener('timeupdate', () => {
+          if (v === clips[current] && v.currentTime > 3) warm(clips[(i + 1) % clips.length]);
+        });
         v.addEventListener('error', () => console.warn('bg video error', v.src, v.error));
       });
     </script>
