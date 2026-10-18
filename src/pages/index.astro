@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import CodeEditor from '../components/CodeEditor';
+import Sticker from '../components/Sticker.astro';
 
 const title = 'toitoi.dev';
 const description = 'toitoi — interactive landing with a tiny code playground.';
@@ -19,27 +20,55 @@ const description = 'toitoi — interactive landing with a tiny code playground.
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Fira+Code:wght@400;500&family=IBM+Plex+Mono:wght@400;500&family=Geist+Mono:wght@400;500&display=swap"
+    />
   </head>
   <body>
-    <main>
-      <section class="hero">
-        <div class="lockup">
-          <img src="/assets/toitoidev-logo.svg" alt="toitoi mascot" class="mascot" />
-          <img src="/assets/toitoidev-typo.svg" alt="toitoi" class="typo" />
-        </div>
-        <span class="scroll-hint" aria-hidden="true">scroll ↓</span>
-      </section>
+    <video
+      class="bg-video is-active"
+      src="/video/school_10s.webm"
+      autoplay
+      muted
+      playsinline
+      preload="auto"
+      aria-hidden="true"></video>
+    <video class="bg-video" src="/video/hotel_10s.webm" muted playsinline preload="auto" aria-hidden="true"></video>
+    <video class="bg-video" src="/video/bk_10s.webm" muted playsinline preload="auto" aria-hidden="true"></video>
+    <Sticker />
+    <script>
+      // school -> hotel -> bk -> school ... One <video> per clip, each keeps its own src (never reloaded).
+      // When one ends, the next (already rewound and buffered) starts, and the finished one rewinds.
+      const clips = Array.from(document.querySelectorAll<HTMLVideoElement>('.bg-video'));
+      let current = 0;
 
-      <section id="playground" class="playground" aria-labelledby="playground-title">
-        <header class="playground-head">
-          <h2 id="playground-title" class="playground-title">playground</h2>
-          <p class="playground-sub">
-            escribe, cambia el tema, prueba autocompletado con <kbd>Ctrl</kbd>+<kbd>Space</kbd>.
-          </p>
-        </header>
-        <div class="playground-frame">
+      const advance = () => {
+        const prev = clips[current];
+        current = (current + 1) % clips.length;
+        const next = clips[current];
+        const show = () => {
+          next.play().catch((err) => console.warn('bg video play failed', next.src, err));
+          next.classList.add('is-active');
+          prev.classList.remove('is-active');
+          prev.currentTime = 0;
+        };
+        if (next.readyState >= 3) show();
+        else next.addEventListener('canplay', show, { once: true });
+      };
+
+      clips.forEach((v) => {
+        v.addEventListener('ended', () => v === clips[current] && advance());
+        v.addEventListener('error', () => console.warn('bg video error', v.src, v.error));
+      });
+    </script>
+    <main>
+      <section id="playground" class="playground">
+        <!-- <div class="playground-frame">
           <CodeEditor client:visible />
-        </div>
+        </div> -->
       </section>
     </main>
   </body>
