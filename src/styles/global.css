@@ -23,7 +23,7 @@
 
 html,
 body {
-  background: var(--bg);
+  background: #1a0a09; /* dark behind the video so no light seam shows at the edges on phones */
   color: var(--fg);
   min-height: 100%;
   overscroll-behavior: none;
@@ -47,8 +47,8 @@ main {
 .bg-video {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   z-index: 0;
   pointer-events: none;
