@@ -509,7 +509,7 @@ main {
   left: 16px;
   width: clamp(300px, 31vw, 470px);
   height: calc(100vh - 32px);
-  overflow-y: auto;
+  overflow: hidden;
   padding: 14px;
   display: flex;
   flex-direction: column;
@@ -524,6 +524,7 @@ main {
   line-height: 1;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  flex: none;
 }
 
 .sticker-rows {
@@ -544,6 +545,14 @@ main {
 .sticker-item.is-open {
   order: -1;
   margin-bottom: auto;
+  /* Shrinks to the space left under the title so only the text scrolls (see .row-body). */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sticker-item.is-open .sticker-row {
+  flex: none;
 }
 
 .sticker-row {
@@ -575,6 +584,7 @@ main {
 }
 
 .row-panel {
+  min-height: 0;
   display: grid;
   grid-template-rows: 0fr;
   transition: grid-template-rows 480ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -596,6 +606,9 @@ main {
 .sticker-item.is-open .row-body {
   opacity: 1;
   transition-delay: 160ms;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .row-body-inner {
